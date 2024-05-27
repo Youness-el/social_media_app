@@ -1,5 +1,20 @@
 import axios from 'axios';
 
+export const loadUser = () => async (dispatch) => {
+    try {
+        const token = localStorage.getItem('token');
+        if(token){console.log('token')}else{console.log('no token')}
+        const res = await axios.get('/api/users/data', {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        dispatch({ type: 'LOAD_USER_SUCCESS', payload: res.data });
+    } catch (error) {
+        dispatch({ type: 'LOAD_USER_FAIL', payload: error.response.data });
+    }
+};
+
 export const follow = (userId, followId) => async (dispatch) => {
     try {
         await axios.put(`/api/users/${followId}/follow`, { userId });

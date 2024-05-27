@@ -7,11 +7,23 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const postRoutes = require('./routes/posts');
 const messageRoutes = require('./routes/messages');
+const cors = require('cors')
+const fileUpload = require('express-fileupload');
+const bodyParser = require("body-parser");
 
 dotenv.config();
 
 const app = express();
-app.use(express.json());
+app.use(cors({
+    origin: 'http://localhost:5173',
+
+}));
+
+app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(fileUpload());
+app.use('/public', express.static('public'));
+
 
 mongoose.connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,

@@ -27,10 +27,11 @@ export const updatePost = (postId, updatedData) => async (dispatch) => {
     }
 };
 
-export const deletePost = (postId) => async (dispatch) => {
+export const deletePost = (postId,userId) => async (dispatch) => {
     try {
-        await axios.delete(`/api/posts/${postId}`);
-        dispatch({ type: 'DELETE_POST_SUCCESS', payload: postId });
+        await axios.delete(`/api/posts/${postId}`,{ data: { userId } });
+        console.log({postId, userId})
+        dispatch({ type: 'DELETE_POST_SUCCESS', payload:  postId });
     } catch (error) {
         dispatch({ type: 'DELETE_POST_FAIL', payload: error.response.data });
     }
@@ -45,11 +46,22 @@ export const likePost = (postId, userId) => async (dispatch) => {
     }
 };
 
-export const addComment = (postId, commentData) => async (dispatch) => {
+export const addComment = (postId, comment, userId) => async (dispatch) => {
     try {
-        await axios.post(`/api/posts/${postId}/comment`, commentData);
-        dispatch({ type: 'ADD_COMMENT_SUCCESS', payload: { postId, commentData } });
+        const response = await axios.post(`/api/posts/${postId}/comment`, { userId, comment });
+        const newComment = response.data.comment;
+        dispatch({ type: 'ADD_COMMENT_SUCCESS', payload: { postId, comment: newComment, userId } });
     } catch (error) {
         dispatch({ type: 'ADD_COMMENT_FAIL', payload: error.response.data });
     }
 };
+
+
+export const getPosts = (page) => async (dispatch) => {
+    try {
+      const res = await axios.get(`/api/posts?page=${page}`);
+      dispatch({ type: 'GET_POSTS_SUCCESS', payload: res.data });
+    } catch (error) {
+      dispatch({ type: 'GET_POSTS_FAIL', payload: error.response.data });
+    }
+  };

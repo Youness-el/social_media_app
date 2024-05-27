@@ -1,10 +1,28 @@
 const initialState = {
+    user: null,
     following: [],
     error: null,
+    loading: true,
 };
 
 const userReducer = (state = initialState, action) => {
     switch (action.type) {
+        case 'LOAD_USER_SUCCESS':
+            return {
+                ...state,
+                user: action.payload,
+                following: action.payload.following, // Assuming the following data is part of the user payload
+                loading: false,
+                error: null,
+            };
+        case 'LOAD_USER_FAIL':
+            return {
+                ...state,
+                user: null,
+                following: [],
+                loading: false,
+                error: action.payload,
+            };
         case 'FOLLOW_SUCCESS':
             return {
                 ...state,

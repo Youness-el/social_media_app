@@ -1,17 +1,73 @@
 import React, { useState } from 'react';
-import { Form, Button, Container, Row, Col } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { Form, Button, Container, Row, Col, Alert, Image } from 'react-bootstrap';
 import { register } from '../actions/authActions';
 
 const Register = () => {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [formData, setFormData] = useState({
+        username: '',
+        email: '',
+        password: ''
+        
+    });
+    const [previewURL, setPreviewURL] = useState('');
+    const [profilePicture, setImage] = useState();
+    const [validationErrors, setValidationErrors] = useState({});
     const dispatch = useDispatch();
+    const error = useSelector(state => state.auth.error);
+console.log(error)
+    // const handleChange = (e) => {
+    //     setFormData({
+    //         ...formData,
+    //         [e.target.name]: e.target.value
+    //     });
+    // };
 
-    const handleSubmit = (e) => {
+    // const handleFileChange = (e) => {
+    //     const file = e.target.files[0];
+    //     setFormData({
+    //         ...formData,
+    //         profilePicture: file
+    //     });
+    //     setPreviewURL(URL.createObjectURL(file)); // Create preview URL for image
+    // };
+    const handleChange = (e) => {
+        if (e.target.name === "profilePicture") {
+          const reader = new FileReader();
+    
+          reader.onload = () => {
+            if (reader.readyState === 2) {
+              setImage(reader.result);
+              setPreviewURL(reader.result);
+            }
+          };
+    
+          reader.readAsDataURL(e.target.files[0]);
+        } else {
+          setFormData({ ...formData, [e.target.name]: e.target.value });
+        }
+      };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        dispatch(register({ name, email, password }));
+        try {
+            const data = new FormData();
+    data.set("password", formData.password);
+    data.set("email", formData.email);
+    data.set("username", formData.username);
+   
+    if (profilePicture) {
+      data.set("profilePicture", profilePicture);
+    }
+            await dispatch(register(data));
+            setValidationErrors({});
+        } catch (err) {
+            if (err.response && err.response.data && err.response.data.validationErrors) {
+                setValidationErrors(err.response.data.validationErrors);
+            } else {
+                console.error('Error registering user:', err);
+            }
+        }
     };
 
     return (
@@ -19,24 +75,31 @@ const Register = () => {
             <Row className="justify-content-md-center">
                 <Col xs={12} md={6}>
                     <h2>Register</h2>
-                    <Form onSubmit={handleSubmit}>
-                        <Form.Group controlId="formBasicName">
-                            <Form.Label>Name</Form.Label>
+                    {error && <Alert variant="danger">{error.message}</Alert>}
+                    <Form onSubmit={handleSubmit} encType="multipart/form-data">
+                        <Form.Group controlId="formBasicUsername">
+                            <Form.Label>Username</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="Enter name"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
+                                placeholder="Enter username"
+                                name="username"
+                                value={formData.username}
+                                onChange={handleChange}
+                                isInvalid={validationErrors.username}
+                                required
                             />
                         </Form.Group>
 
                         <Form.Group controlId="formBasicEmail">
-                            <Form.Label>Email address</Form.Label>
+                            <Form.Label>Email</Form.Label>
                             <Form.Control
                                 type="email"
                                 placeholder="Enter email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                isInvalid={validationErrors.email}
+                                required
                             />
                         </Form.Group>
 
@@ -45,14 +108,34 @@ const Register = () => {
                             <Form.Control
                                 type="password"
                                 placeholder="Password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                isInvalid={validationErrors.password}
+                                required
                             />
+                        </Form.Group>
+
+                        <Form.Group controlId="formBasicProfilePicture">
+                            <Form.Label>Profile Picture</Form.Label>
+                            <Form.Control
+                                type="file"
+                                name="profilePicture"
+                                onChange={handleChange}
+                                isInvalid={validationErrors.profilePicture}
+                                accept="image/*"
+                            />
+                            {previewURL && <Image src={previewURL} alt="Profile Preview" className="mt-2" style={{ maxWidth: '100px' }} />}
                         </Form.Group>
 
                         <Button variant="primary" type="submit">
                             Register
                         </Button>
+                        <div className="mt-2">
+                            <p>
+                                Already have an account? <a href="/login">Login here</a>
+                            </p>
+                        </div>
                     </Form>
                 </Col>
             </Row>
