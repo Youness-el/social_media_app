@@ -12,6 +12,7 @@ import moment from "moment";
 import { faEllipsisH, faTimes } from "@fortawesome/free-solid-svg-icons";
 
 const PostsItem = ({ post, userId }) => {
+  console.log(post.likes)
   const [liked, setLiked] = useState(post.likes.includes(userId));
   const [showComments, setShowComments] = useState(false);
   const [comment, setComment] = useState("");

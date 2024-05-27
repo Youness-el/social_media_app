@@ -30,7 +30,7 @@ exports.unfollow = async (req, res) => {
         await user.updateOne({ $pull: { followers: req.body.userId } });
         await currentUser.updateOne({ $pull: { following: req.params.id } });
         res.status(200).json("User has been unfollowed");
-      } else {
+      } else { 
         res.status(403).json("You do not follow this user");
       }
     } catch (err) {
@@ -59,7 +59,17 @@ exports.getuserByUsername = async (req, res) => {
   try {
     const username = req.params.username;
     // Find the user by username
-    const user = await User.findOne({ username });
+    const user = await User.findOne({ username }).select("-password").populate({
+      path: 'posts',
+      populate: [
+        { path: 'userId', select: 'username profilePicture' }, // Populate user info in posts
+        { path: 'likes', select: 'username profilePicture' }, // Populate likes with user info
+        {
+          path: 'comments',
+          populate: { path: 'userId', select: 'username profilePicture' }, // Populate comments with user info
+        },
+      ],
+    });
 
     if (!user) { 
       return res.status(404).json({ message: "User not found" });

@@ -1,0 +1,113 @@
+.container-article {
+    position: relative;
+  }
+  
+  .image {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .container-article:hover .overlay {
+    opacity: 1;
+    cursor: pointer;
+  }
+  
+  .text {
+    color: white;
+    font-size: 20px;
+    text-align: center;
+  }
+  
+  .custom-modal .modal-dialog {
+    max-width: 90vw;
+    width: 90vw;
+    height: 90vh;
+  }
+  
+  .custom-modal .modal-content {
+    height: 90vh;
+    display: flex;
+    align-items: stretch;
+  }
+  
+  .modal-body-custom {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  
+  .modal-content-custom {
+    flex: 1;
+    display: flex;
+    align-items: stretch;
+  }
+  
+  .modal-image-section {
+    /* background-color: #000; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+  
+  .image-container {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .modal-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures the image covers the container */
+  }
+  
+  .modal-content-section {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .comments-section {
+    flex: 1;
+    max-height: 178px; /* Adjust the height as needed */
+    overflow-y: auto;
+  }
+  
+  
+  .comment-item {
+    font-size: 0.875rem;
+  }
+  
+  .comment-item h6 {
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .comment-item p {
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .comment-form {
+    border-top: 1px solid #ddd;
+    padding-top: 15px;
+  }
+  
+  .emoji-icon {
+    cursor: pointer;
+  }
+  

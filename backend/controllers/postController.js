@@ -1,15 +1,22 @@
 const Post = require("../models/Post");
+const User = require("../models/User");
 
 exports.createPost = async (req, res) => {
-  const newPost = new Post(req.body);
+  const { userId, content, imageUrl } = req.body;
+  
   try {
+    // Create a new post
+    const newPost = new Post({ userId, content, imageUrl });
     const savedPost = await newPost.save();
+
+    // Update the user's posts array
+    await User.findByIdAndUpdate(userId, { $push: { posts: savedPost._id } });
+
     res.status(200).json(savedPost);
   } catch (err) {
     res.status(500).json(err);
   }
 };
-
 exports.getPost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);

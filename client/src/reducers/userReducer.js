@@ -1,5 +1,8 @@
+// userReducer.js
+
 const initialState = {
     user: null,
+    profile: null,
     following: [],
     error: null,
     loading: true,
@@ -11,7 +14,7 @@ const userReducer = (state = initialState, action) => {
             return {
                 ...state,
                 user: action.payload,
-                following: action.payload.following, // Assuming the following data is part of the user payload
+                following: action.payload.following,
                 loading: false,
                 error: null,
             };
@@ -20,6 +23,25 @@ const userReducer = (state = initialState, action) => {
                 ...state,
                 user: null,
                 following: [],
+                loading: false,
+                error: action.payload,
+            };
+        case 'FETCH_USER_PROFILE_REQUEST':
+            return {
+                ...state,
+                loading: true,
+            };
+        case 'FETCH_USER_PROFILE_SUCCESS':
+            return {
+                ...state,
+                profile: action.payload,
+                loading: false,
+                error: null,
+            };
+        case 'FETCH_USER_PROFILE_FAIL':
+            return {
+                ...state,
+                profile: null,
                 loading: false,
                 error: action.payload,
             };
@@ -41,9 +63,27 @@ const userReducer = (state = initialState, action) => {
                 ...state,
                 error: action.payload,
             };
+        case 'ADD_COMMENT_SUCCESS':
+            return {
+                ...state,
+                profile: {
+                    ...state.profile,
+                    posts: state.profile.posts.map(post => {
+                        if (post._id === action.payload.postId) {
+                            return {
+                                ...post,
+                                comments: [...post.comments, action.payload.comment],
+                            };
+                        }
+                        return post;
+                    }),
+                },
+            };
         default:
             return state;
     }
 };
 
 export default userReducer;
+
+

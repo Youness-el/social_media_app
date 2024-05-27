@@ -1,4 +1,3 @@
-// Header.jsx
 import React, { useEffect } from "react";
 import {
   Navbar,
@@ -18,18 +17,22 @@ const Header = () => {
   const history = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.user);
+  const loading = useSelector((state) => state.user.loading);
+
   useEffect(() => {
-    dispatch(loadUser());
-  }, [dispatch]);
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
-  // const username = user.username; // Extract username from user state
+    if (!user) {
+      dispatch(loadUser());
+    }
+  }, [dispatch, user]);
 
   const handleLogout = () => {
     dispatch(logout());
     history("/login");
   };
+
+  if (loading || !user) {
+    return <div>Loading...</div>; // Or a loading spinner
+  }
 
   return (
     <Navbar bg="dark" variant="dark" expand="lg">
@@ -51,17 +54,17 @@ const Header = () => {
           </Nav.Link>
           <Dropdown alignRight>
             <Dropdown.Toggle variant="success" id="dropdown-basic">
-              {/* <Image
+              <Image
                 src={user.profilePicture}
                 roundedCircle
                 width="30"
                 height="30"
-              /> */}
+              />
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              {/* <Dropdown.Item as={Link} to={`/profile/${username}`}> 
+              <Dropdown.Item as={Link} to={`/profile/${user.username}`}>
                 Profile
-              </Dropdown.Item> */}
+              </Dropdown.Item>
               <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>

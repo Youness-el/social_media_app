@@ -14,20 +14,27 @@ import UserProfile from './components/UserProfile';
 const App = () => {
     const dispatch = useDispatch();
     const isAuthenticated = useSelector((state) => state.auth.authenticated);
-    const authChecked = useSelector((state) => state.auth.authChecked); // New state to track if auth check is complete
+    const authChecked = useSelector((state) => state.auth.authChecked);
+
     useEffect(() => {
         dispatch(checkAuthStatus());
     }, [dispatch]);
+
     useEffect(() => {
-        if(isAuthenticated){
-            dispatch(loadUser())
+        if (isAuthenticated) {
+            dispatch(loadUser());
         }
     }, [dispatch, isAuthenticated]);
+
     const API_URL = import.meta.env.VITE_APP_API_URL;
     axios.defaults.baseURL = API_URL;
+    const token = localStorage.getItem('token');
+    if (token) {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
 
     if (!authChecked) {
-        return <div>Loading...</div>; // Or a loading spinner
+        return <div>Loading...</div>;
     }
 
     return (
@@ -38,9 +45,8 @@ const App = () => {
                 <Route path="/register" element={isAuthenticated ? <Navigate to="/" /> : <Register />} />
                 <Route element={<PrivateRoute isAuthenticated={isAuthenticated} />}>
                     <Route path="/" element={<Home />} />
-                    <Route path="/profile/:username" element={<UserProfile />} /> {/* Add username parameter */}
-
-                    {/* <Route path="/messages" element={<Messages />} />  */}
+                    <Route path="/profile/:username" element={<UserProfile />} />
+                    {/* Other private routes */}
                 </Route>
             </Routes>
         </Router>
