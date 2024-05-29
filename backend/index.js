@@ -44,7 +44,9 @@ app.use('/api/messages', messageRoutes);
 const PORT = process.env.PORT || 5000;
 
 const server = http.createServer(app);
-const io = new Server(server, {
+const io =  new Server(server, {
+    path: '/api/socket',
+    addTrailingSlash: false,
     cors: {
         origin: '*',
     },
