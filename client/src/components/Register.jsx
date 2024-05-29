@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Form, Button, Container, Row, Col, Alert, Image } from 'react-bootstrap';
+import { Form, Button, Container, Row, Col, Alert, Image, Modal } from 'react-bootstrap';
 import Resizer from 'react-image-file-resizer';
 import { register } from '../actions/authActions';
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
     const [formData, setFormData] = useState({
@@ -13,8 +14,12 @@ const Register = () => {
     const [previewURL, setPreviewURL] = useState('');
     const [profilePicture, setProfilePicture] = useState(null);
     const [validationErrors, setValidationErrors] = useState({});
+    const [showModal, setShowModal] = useState(false);
+    const [modalContent, setModalContent] = useState('');
+    const [modalVariant, setModalVariant] = useState('');
     const dispatch = useDispatch();
     const error = useSelector(state => state.auth.error);
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         if (e.target.name === "profilePicture") {
@@ -52,12 +57,27 @@ const Register = () => {
             }
             await dispatch(register(data));
             setValidationErrors({});
+            setModalContent('Registration successful! You can now login.');
+            setModalVariant('success');
+            setShowModal(true);
         } catch (err) {
             if (err.response && err.response.data && err.response.data.validationErrors) {
                 setValidationErrors(err.response.data.validationErrors);
+                setModalContent('Registration failed. Please check your inputs.');
+                setModalVariant('danger');
             } else {
                 console.error('Error registering user:', err);
+                setModalContent('An unexpected error occurred. Please try again later.');
+                setModalVariant('danger');
             }
+            setShowModal(true);
+        }
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+        if (modalVariant === 'success') {
+            navigate('/login');
         }
     };
 
@@ -130,6 +150,20 @@ const Register = () => {
                     </Form>
                 </Col>
             </Row>
+
+            <Modal show={showModal} onHide={handleCloseModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{modalVariant === 'success' ? 'Success' : 'Error'}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>{modalContent}</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant={modalVariant === 'success' ? 'success' : 'danger'} onClick={handleCloseModal}>
+                        {modalVariant === 'success' ? 'Go to Login' : 'Close'}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </Container>
     );
 };
