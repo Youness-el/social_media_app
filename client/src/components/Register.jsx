@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Form, Button, Container, Row, Col, Alert, Image } from 'react-bootstrap';
+import Resizer from 'react-image-file-resizer';
 import { register } from '../actions/authActions';
 
 const Register = () => {
@@ -8,57 +9,47 @@ const Register = () => {
         username: '',
         email: '',
         password: ''
-        
     });
     const [previewURL, setPreviewURL] = useState('');
-    const [profilePicture, setImage] = useState();
+    const [profilePicture, setProfilePicture] = useState(null);
     const [validationErrors, setValidationErrors] = useState({});
     const dispatch = useDispatch();
     const error = useSelector(state => state.auth.error);
-console.log(error)
-    // const handleChange = (e) => {
-    //     setFormData({
-    //         ...formData,
-    //         [e.target.name]: e.target.value
-    //     });
-    // };
 
-    // const handleFileChange = (e) => {
-    //     const file = e.target.files[0];
-    //     setFormData({
-    //         ...formData,
-    //         profilePicture: file
-    //     });
-    //     setPreviewURL(URL.createObjectURL(file)); // Create preview URL for image
-    // };
     const handleChange = (e) => {
         if (e.target.name === "profilePicture") {
-          const reader = new FileReader();
-    
-          reader.onload = () => {
-            if (reader.readyState === 2) {
-              setImage(reader.result);
-              setPreviewURL(reader.result);
+            const file = e.target.files[0];
+            if (file) {
+                Resizer.imageFileResizer(
+                    file,
+                    300, // max width
+                    300, // max height
+                    'JPEG',
+                    70, // quality
+                    0,
+                    uri => {
+                        setProfilePicture(uri);
+                        setPreviewURL(uri);
+                    },
+                    'base64'
+                );
             }
-          };
-    
-          reader.readAsDataURL(e.target.files[0]);
         } else {
-          setFormData({ ...formData, [e.target.name]: e.target.value });
+            setFormData({ ...formData, [e.target.name]: e.target.value });
         }
-      };
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const data = new FormData();
-    data.set("password", formData.password);
-    data.set("email", formData.email);
-    data.set("username", formData.username);
-   
-    if (profilePicture) {
-      data.set("profilePicture", profilePicture);
-    }
+            data.set("password", formData.password);
+            data.set("email", formData.email);
+            data.set("username", formData.username);
+
+            if (profilePicture) {
+                data.set("profilePicture", profilePicture);
+            }
             await dispatch(register(data));
             setValidationErrors({});
         } catch (err) {
