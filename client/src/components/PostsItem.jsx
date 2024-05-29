@@ -12,7 +12,7 @@ import moment from "moment";
 import { faEllipsisH, faTimes } from "@fortawesome/free-solid-svg-icons";
 
 const PostsItem = ({ post, userId }) => {
-  console.log(post.likes)
+  // console.log(post.likes)
   const [liked, setLiked] = useState(post.likes.includes(userId));
   const [showComments, setShowComments] = useState(false);
   const [comment, setComment] = useState("");
@@ -81,14 +81,16 @@ const PostsItem = ({ post, userId }) => {
         </span>
       </div>
 
-      <div className="card-body p-0">
-        <img
-          src={post.imageUrl}
-          className="img-fluid"
-          onDoubleClick={handleDoubleTap}
-          alt="Post"
-        />
-      </div>
+      <div className="card-body p-0" style={{ height: '500px', overflow: 'hidden' }}>
+  <img
+    src={post.imageUrl}
+    className="img-fluid"
+    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+    onDoubleClick={handleDoubleTap}
+    alt="Post"
+  />
+</div>
+
 
       <div className="card-footer">
         <div className="d-flex align-items-center">

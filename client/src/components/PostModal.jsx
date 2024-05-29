@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useReducer, useState } from "react";
 import { Modal, Image, Button, Form } from "react-bootstrap";
 import { BsHeartFill, BsChatFill, BsEmojiSmile } from "react-icons/bs";
 import moment from "moment";
@@ -11,12 +11,14 @@ import {
 import { faHeart as faHeartSolid } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch } from "react-redux";
 import { addComment } from "../actions/userActions";
-
-const PostModal = ({ post, onHide,userId }) => {
-    // console.log(`${post.userId.username},${userId}`)
+import "./style.css";
+const PostModal = ({ post, onHide, userId }) => {
+  // console.log(`${post.userId.username},${userId}`)
   const [commentInput, setCommentInput] = useState("");
   const timeDifference = moment(post.createdAt).fromNow();
-  const [liked, setLiked] = useState(post.likes.some(like => like._id === userId)); // Check if userId is in the likes array
+  const [liked, setLiked] = useState(
+    post.likes.some((like) => like._id === userId)
+  ); // Check if userId is in the likes array
   const dispatch = useDispatch();
 
   const handleInputChange = (e) => {
@@ -27,17 +29,26 @@ const PostModal = ({ post, onHide,userId }) => {
     setLiked(!liked);
     dispatch(likePost(post._id, userId));
   };
+  const handledeletePost = () => {
+    setLiked(!liked);
+    dispatch(deletePost(post._id, userId));
+  };
   const handlePostComment = () => {
     // Add logic to post the comment
     console.log("Posting comment:", commentInput);
     // Clear comment input after posting
     dispatch(addComment(post._id, commentInput, userId));
-
     setCommentInput("");
   };
 
   return (
-    <Modal show onHide={onHide} centered dialogClassName="custom-modal" size="lg">
+    <Modal
+      show
+      onHide={onHide}
+      centered
+      dialogClassName="custom-modal"
+      size="lg"
+    >
       <Modal.Body className="p-0 modal-body-custom">
         <div className="row no-gutters modal-content-custom">
           <div className="col-md-7 modal-image-section">
@@ -58,7 +69,14 @@ const PostModal = ({ post, onHide,userId }) => {
               </div>
               <div>
                 <Button variant="link" className="text-dark me-2">
-                  {post.userId._id === userId ? "Delete" : null}
+                  {post.userId._id === userId ? (
+                    <button
+                      className="btn btn-danger"
+                      onClick={handledeletePost}
+                    >
+                      Delete
+                    </button>
+                  ) : null}
                 </Button>
                 <Button variant="link" className="text-dark" onClick={onHide}>
                   Cancel
@@ -68,7 +86,10 @@ const PostModal = ({ post, onHide,userId }) => {
             <hr />
             <div className="comments-section">
               {post.comments.map((comment, index) => (
-                <div key={index} className="d-flex align-items-start mb-2 comment-item">
+                <div
+                  key={index}
+                  className="d-flex align-items-start mb-2 comment-item"
+                >
                   <Image
                     src={comment.userId.profilePicture}
                     alt="comment userId"
@@ -86,25 +107,23 @@ const PostModal = ({ post, onHide,userId }) => {
             </div>
             <hr />
             <div className="post-actions mt-0">
-            <div className="d-flex align-items-center">
-          <FontAwesomeIcon
-            icon={liked ? faHeartSolid : faHeartRegular}
-            onClick={handleLike}
-            className="me-3"
-            style={{ fontSize: "24px", cursor: "pointer" }}
-          />
-          <FontAwesomeIcon
-            icon={faComment}
-            // onClick={handlePostComment}
-            style={{ fontSize: "24px", cursor: "pointer" }}
-          />
-        </div>
-             
-              {post.likes.length} Likes <br/>
+              <div className="d-flex align-items-center">
+                <FontAwesomeIcon
+                  icon={liked ? faHeartSolid : faHeartRegular}
+                  onClick={handleLike}
+                  className="me-3"
+                  style={{ fontSize: "24px", cursor: "pointer" }}
+                />
+                <FontAwesomeIcon
+                  icon={faComment}
+                  // onClick={handlePostComment}
+                  style={{ fontSize: "24px", cursor: "pointer" }}
+                />
+              </div>
+              {post.likes.length} Likes <br />
               <p className="text-muted small">{timeDifference}</p>
             </div>
             <Form className="comment-form d-flex align-items-center mt-3">
-              
               <Form.Control
                 type="text"
                 placeholder="Add a comment..."
@@ -116,7 +135,6 @@ const PostModal = ({ post, onHide,userId }) => {
                 Post
               </Button>
             </Form>
-           
           </div>
         </div>
       </Modal.Body>

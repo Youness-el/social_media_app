@@ -1,18 +1,38 @@
 const Post = require("../models/Post");
 const User = require("../models/User");
-
+const cloudinary = require("cloudinary").v2;
+const dotenv = require("dotenv");
+dotenv.config();
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 exports.createPost = async (req, res) => {
   const { userId, content, imageUrl } = req.body;
-  
+  // Upload profile picture to Cloudinary if provided
+  let image = '';
+  if (imageUrl) {
+      console.log('Uploading profile picture to Cloudinary...');
+      const uploadedResponse = await cloudinary.uploader.upload(imageUrl, {
+          folder: "socialMedia/posts"
+      });
+      image = uploadedResponse.secure_url;
+      console.log('Profile picture uploaded:', image);
+  }else{throw new Error('no img is uploaded')}
   try {
     // Create a new post
-    const newPost = new Post({ userId, content, imageUrl });
+    const newPost = new Post({ userId, content, imageUrl:image });
     const savedPost = await newPost.save();
 
     // Update the user's posts array
     await User.findByIdAndUpdate(userId, { $push: { posts: savedPost._id } });
 
-    res.status(200).json(savedPost);
+    // Populate userId field with user object
+    const populatedPost = await Post.findById(savedPost._id).populate('userId', 'username profilePicture');
+
+    res.status(200).json(populatedPost);
   } catch (err) {
     res.status(500).json(err);
   }
@@ -100,7 +120,7 @@ exports.addComment = async (req, res) => {
 // Add getPosts function
 exports.getPosts = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 5;
+  const limit = parseInt(req.query.limit) || 3;
   const skip = (page - 1) * limit;
 
   try {
@@ -115,6 +135,7 @@ exports.getPosts = async (req, res) => {
         posts,
         currentPage: page,
         totalPages: Math.ceil((await Post.countDocuments()) / limit),
+        totalPosts: Math.ceil((await Post.countDocuments()))
       });
   } catch (err) {
     res.status(500).json(err);

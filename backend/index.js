@@ -7,23 +7,22 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const postRoutes = require('./routes/posts');
 const messageRoutes = require('./routes/messages');
-const cors = require('cors')
+const cors = require('cors');
 const fileUpload = require('express-fileupload');
 const bodyParser = require("body-parser");
+const Message = require('./models/Message'); // Import Message model
 
 dotenv.config();
 
 const app = express();
 app.use(cors({
     origin: 'http://localhost:5173',
-
 }));
 
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
 app.use('/public', express.static('public'));
-
 
 mongoose.connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
@@ -50,10 +49,17 @@ const io = new Server(server, {
 
 io.on('connection', (socket) => {
     console.log('a user connected');
-    
-    socket.on('sendMessage', ({ senderId, receiverId, content }) => {
-        const message = { senderId, receiverId, content, createdAt: new Date() };
-        io.emit('receiveMessage', message);
+
+    socket.on('joinRoom', ({ roomId }) => {
+        socket.join(roomId);
+    });
+
+    socket.on('sendMessage', async ({ roomId, senderId,receiverId, content }) => {
+        const message = new Message({ roomId, senderId,receiverId, content, createdAt: new Date() });
+        await message.save();
+        
+        // Emit to the specific room
+        io.to(roomId).emit('receiveMessage', message);
     });
 
     socket.on('disconnect', () => {

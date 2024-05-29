@@ -1,19 +1,15 @@
-import React, { useEffect } from "react";
-import {
-  Navbar,
-  Nav,
-  Form,
-  FormControl,
-  Button,
-  Dropdown,
-  Image,
-} from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../actions/authActions";
-import { loadUser } from "../actions/userActions";
+import React, { useEffect, useState } from 'react';
+import { Navbar, Nav, Dropdown } from 'react-bootstrap';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../actions/authActions';
+import { loadUser } from '../actions/userActions';
+import AddPost from './AddPost';
+import { FaEnvelope, FaCamera } from 'react-icons/fa';
+import SearchBox from './SearchBox';
 
 const Header = () => {
+  const [showAddPost, setShowAddPost] = useState(false);
   const history = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.user);
@@ -27,7 +23,16 @@ const Header = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    history("/login");
+    history('/login');
+  };
+
+  const handleShowAddPost = () => {
+    setShowAddPost(true);
+  };
+
+  const handleCloseAddPost = () => {
+    setShowAddPost(false);
+    history('/');
   };
 
   if (loading || !user) {
@@ -35,30 +40,27 @@ const Header = () => {
   }
 
   return (
-    <Navbar bg="dark" variant="dark" expand="lg">
-      <Navbar.Brand as={Link} to="/">
-        AppName
-      </Navbar.Brand>
+    <>
+    <Navbar bg="dark" variant="dark" expand="lg" className="w-100">
+      <Navbar.Brand as={Link} to="/">AppName</Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
-        <Form className="ml-auto">
-          <FormControl type="text" placeholder="Search" className="mr-sm-2" />
-          <Button variant="outline-success">Search</Button>
-        </Form>
-        <Nav className="ml-auto">
-          <Nav.Link as={Link} to="/messages">
-            <i className="fas fa-envelope"></i> Messages
+        <Nav className="mx-auto">
+          <SearchBox />
+        </Nav>
+        <Nav className="ml-auto d-flex align-items-center">
+          <Nav.Link as={Link}  to={`/messages/${user._id}`}>
+            <FaEnvelope size={24} />
           </Nav.Link>
-          <Nav.Link as={Link} to="/add-post">
-            <i className="fas fa-plus-circle"></i> Add Post
+          <Nav.Link onClick={handleShowAddPost}>
+            <FaCamera size={24} />
           </Nav.Link>
-          <Dropdown alignRight>
-            <Dropdown.Toggle variant="success" id="dropdown-basic">
-              <Image
+          <Dropdown align={'end'}>
+            <Dropdown.Toggle variant="dark" id="dropdown-basic">
+              <img
                 src={user.profilePicture}
-                roundedCircle
-                width="30"
-                height="30"
+                alt="User"
+                style={{ width: '30px', height: '30px', borderRadius: '50%' }}
               />
             </Dropdown.Toggle>
             <Dropdown.Menu>
@@ -71,6 +73,9 @@ const Header = () => {
         </Nav>
       </Navbar.Collapse>
     </Navbar>
+      {/* AddPost Modal */}
+      <AddPost show={showAddPost} handleClose={handleCloseAddPost} />
+    </>
   );
 };
 

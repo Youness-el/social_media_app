@@ -2,7 +2,12 @@ import axios from 'axios';
 
 export const createPost = (postData) => async (dispatch) => {
     try {
-        const res = await axios.post('/api/posts', postData);
+        const config = {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        };
+        const res = await axios.post('/api/posts', postData,config);
         dispatch({ type: 'CREATE_POST_SUCCESS', payload: res.data });
     } catch (error) {
         dispatch({ type: 'CREATE_POST_FAIL', payload: error.response.data });

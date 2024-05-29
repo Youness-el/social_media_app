@@ -5,7 +5,9 @@ exports.follow = async (req, res) => {
   if (req.body.userId !== req.params.id) {
     try {
       const user = await User.findById(req.params.id);
+      console.log('user to follow',user)
       const currentUser = await User.findById(req.body.userId);
+      console.log('curr',req.body.userId)
       if (!user.followers.includes(req.body.userId)) {
         await user.updateOne({ $push: { followers: req.body.userId } });
         await currentUser.updateOne({ $push: { following: req.params.id } });
@@ -53,6 +55,28 @@ exports.loadUser = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+exports.loadUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId).select("-password").populate({
+      path: 'posts',
+      populate: [
+        { path: 'userId', select: 'username profilePicture' }, // Populate user info in posts
+        { path: 'likes', select: 'username profilePicture' }, // Populate likes with user info
+        {
+          path: 'comments',
+          populate: { path: 'userId', select: 'username profilePicture' }, // Populate comments with user info
+        },
+      ],
+    });;
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 // Route to load user by username
 exports.getuserByUsername = async (req, res) => {
@@ -69,7 +93,8 @@ exports.getuserByUsername = async (req, res) => {
           populate: { path: 'userId', select: 'username profilePicture' }, // Populate comments with user info
         },
       ],
-    });
+    }) .populate('followers', 'username profilePicture') // Populate followers with user info
+    .populate('following', 'username profilePicture');;
 
     if (!user) { 
       return res.status(404).json({ message: "User not found" });
@@ -79,5 +104,41 @@ exports.getuserByUsername = async (req, res) => {
     res.status(200).json(user);
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+};
+
+
+exports.searchUsers = async (req, res) => {
+  try {
+    const keyword = req.query.keyword;
+    if(keyword){
+      console.log("key",keyword)
+    }else{
+      console.log('no key')
+    }
+    if (keyword) {
+      
+      const users = await User.find({
+        $or: [
+          { username: { $regex: keyword, $options: 'i' } },
+          { name: { $regex: keyword, $options: 'i' } }
+        ]
+      }).limit(5); // Limit to 5 results for performance
+
+      return res.status(200).json({
+        success: true,
+        users
+      });
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: 'Keyword is required'
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Server Error'
+    });
   }
 };

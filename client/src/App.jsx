@@ -10,6 +10,8 @@ import { checkAuthStatus } from './actions/authActions';
 import Header from './components/Header';
 import { loadUser } from './actions/userActions';
 import UserProfile from './components/UserProfile';
+import Chat from './components/Chat';
+import Messages from './components/Messages';
 
 const App = () => {
     const dispatch = useDispatch();
@@ -18,13 +20,14 @@ const App = () => {
 
     useEffect(() => {
         dispatch(checkAuthStatus());
-    }, [dispatch]);
+    }, []);
 
     useEffect(() => {
         if (isAuthenticated) {
             dispatch(loadUser());
         }
-    }, [dispatch, isAuthenticated]);
+    }, [ isAuthenticated]);
+    
 
     const API_URL = import.meta.env.VITE_APP_API_URL;
     axios.defaults.baseURL = API_URL;
@@ -46,6 +49,8 @@ const App = () => {
                 <Route element={<PrivateRoute isAuthenticated={isAuthenticated} />}>
                     <Route path="/" element={<Home />} />
                     <Route path="/profile/:username" element={<UserProfile />} />
+                    <Route path="/chat/:userId/:profileId" element={<Chat />} />
+                    <Route path="/messages/:userId" element={<Messages />} />
                     {/* Other private routes */}
                 </Route>
             </Routes>

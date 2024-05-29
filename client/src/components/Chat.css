@@ -1,0 +1,120 @@
+.chat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 50%;
+    max-width: 600px;
+    margin: 20px auto;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+
+.chat-header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 15px;
+    border-bottom: 1px solid #ccc;
+    background-color: #f8f8f8;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    position: relative;
+}
+
+.back-button {
+    background: none;
+    border: none;
+    position: absolute;
+    left: 10px;
+    cursor: pointer;
+}
+
+.chat-header-img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 15px;
+    margin-left: 30px;
+}
+
+.chat-header-username {
+    font-size: 1rem;
+    margin: 0;
+    
+}
+
+.chat-body {
+    width: 100%;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.chat-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 350px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+}
+
+.chat-message {
+    display: inline-block;
+    max-width: 80%;
+    padding: 10px;
+    border-radius: 10px;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.chat-message-sent {
+    align-self: flex-end;
+    background-color: lightblue;
+    text-align: right;
+}
+
+.chat-message-received {
+    align-self: flex-start;
+    background-color: lightgrey;
+    text-align: left;
+}
+
+.chat-input-container {
+    display: flex;
+    width: 100%;
+}
+
+.chat-input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px;
+    box-sizing: border-box;
+}
+
+.chat-send-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.chat-send-button:hover {
+    background-color: #0056b3;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .chat-card {
+        width: 90%;
+        height: fit-content;
+    }
+
+}

@@ -1,7 +1,10 @@
 const initialState = {
-  posts: [],
-  error: null,
-};
+    posts: [],
+    currentPage: 1,
+    totalPages: 1,
+    loading: false,
+    error: null,
+  };
 
 const postReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -11,12 +14,21 @@ const postReducer = (state = initialState, action) => {
               posts: [...state.posts, action.payload],
               error: null,
           };
-      case 'GET_POSTS_SUCCESS':
-          return {
+          case 'GET_POSTS_SUCCESS':
+      return {
+        ...state,
+        posts: action.payload.currentPage === 1 ? action.payload.posts : [...state.posts, ...action.payload.posts],
+        currentPage: action.payload.currentPage,
+        totalPages: action.payload.totalPages,
+        loading: false,
+        error: null,
+      };
+          case 'GET_POSTS_FAIL':
+            return {
               ...state,
-              posts: [...state.posts, ...action.payload.posts],
-              error: null,
-          };
+              loading: false,
+              error: action.payload,
+            };
       case 'UPDATE_POST_SUCCESS':
           return {
               ...state,
