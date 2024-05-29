@@ -14,7 +14,7 @@ const navigate= useNavigate()
 
     useEffect(() => {
         // Connect to Socket.IO server only once when the component mounts
-        const newSocket = io('http://localhost:5000');
+        const newSocket = io('https://smgram-api.vercel.app');
         setSocket(newSocket);
 
         // Join chat room
