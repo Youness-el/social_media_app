@@ -82,4 +82,4 @@ Contributions are welcome! Please fork the repository and create a pull request 
 This project is licensed under the MIT License. See the LICENSE file for details.
 
 ## Contact
-If you have any questions or feedback, please contact me at [zouhairfgra@gmail.com].
+If you have any questions or feedback, please contact me at [zouhairfgra@gmail.com] or [fadyou1998@gmail.com]
